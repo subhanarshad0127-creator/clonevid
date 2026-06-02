@@ -30,7 +30,7 @@ const features = [
     icon: User2,
     color: '#FF3CAC',
     title: 'AI Avatar',
-    desc: 'HeyGen-powered photorealistic avatars. Choose from our library or create your digital twin.',
+    desc: 'D-ID powered photorealistic avatars. Choose from our library or upload your own photo.',
   },
 ];
 
@@ -45,10 +45,11 @@ const steps = [
 const plans = [
   {
     name: 'Starter',
-    price: 19,
-    credits: 10,
+    price: 9.99,
+    minutes: 10,
+    planId: 'starter',
     features: [
-      '10 videos / month',
+      '10 minutes / month',
       'AI Script Generation',
       'Basic Voice Options',
       'TikTok & Reels Export',
@@ -59,13 +60,14 @@ const plans = [
   },
   {
     name: 'Creator',
-    price: 49,
-    credits: 30,
+    price: 29.99,
+    minutes: 40,
+    planId: 'creator',
     features: [
-      '30 videos / month',
+      '40 minutes / month',
       'AI Script Generation',
       'Voice Cloning',
-      'AI Avatar (5 options)',
+      'AI Avatar (D-ID)',
       'All Platform Export',
       'Auto B-Roll',
       'Caption Generator',
@@ -75,10 +77,11 @@ const plans = [
   },
   {
     name: 'Pro',
-    price: 99,
-    credits: 100,
+    price: 59.99,
+    minutes: 90,
+    planId: 'pro',
     features: [
-      '100 videos / month',
+      '90 minutes / month',
       'AI Script Generation',
       'Unlimited Voice Cloning',
       'Custom AI Avatar',
@@ -92,6 +95,40 @@ const plans = [
   },
 ];
 
+function PayPalButton({ planName, price, planId, accent }) {
+  const handleClick = async () => {
+    try {
+      const res = await fetch('/api/paypal/create-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ planId }),
+      });
+      const data = await res.json();
+      if (data.approvalUrl) {
+        window.open(data.approvalUrl, '_blank');
+      }
+    } catch (err) {
+      console.error('PayPal subscription error:', err);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className="w-full py-3 rounded-xl text-sm font-bold text-center transition-all flex items-center justify-center gap-2"
+      style={{ background: '#FFC439', color: '#003087' }}
+    >
+      <span
+        className="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+        style={{ background: '#003087' }}
+      >
+        PP
+      </span>
+      Subscribe with PayPal
+    </button>
+  );
+}
+
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-bg-primary bg-grid-pattern font-dm">
@@ -102,7 +139,7 @@ export default function HomePage() {
             <div className="w-8 h-8 rounded-lg gradient-btn flex items-center justify-center">
               <Zap size={18} className="text-white" />
             </div>
-            <span className="font-syne font-bold text-lg gradient-text">CloneVid</span>
+            <span className="font-syne font-bold text-lg gradient-text">Viralio</span>
           </div>
           <div className="hidden md:flex items-center gap-6 text-sm text-slate-400">
             <a href="#features" className="hover:text-white transition-colors">Features</a>
@@ -139,7 +176,7 @@ export default function HomePage() {
           </h1>
 
           <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 animate-slide-up">
-            CloneVid uses cutting-edge AI to write your script, clone your voice, generate your
+            Viralio uses cutting-edge AI to write your script, clone your voice, generate your
             avatar, and assemble a publish-ready short video — automatically.
           </p>
 
@@ -288,10 +325,11 @@ export default function HomePage() {
                     <Zap size={18} style={{ color: plan.accent }} />
                   </div>
                   <h3 className="font-syne font-bold text-xl text-white mb-1">{plan.name}</h3>
-                  <div className="flex items-end gap-1 mb-6">
+                  <div className="flex items-end gap-1 mb-1">
                     <span className="text-4xl font-bold text-white">${plan.price}</span>
                     <span className="text-slate-400 mb-1">/month</span>
                   </div>
+                  <p className="text-xs text-slate-500 mb-6">{plan.minutes} minutes of video / month</p>
                 </div>
 
                 <ul className="flex flex-col gap-3 mb-8 flex-1">
@@ -303,23 +341,15 @@ export default function HomePage() {
                   ))}
                 </ul>
 
-                <Link
-                  to="/generate"
-                  className="w-full py-3 rounded-xl text-sm font-bold text-center transition-all"
-                  style={
-                    plan.popular
-                      ? {
-                          background: plan.accent,
-                          color: '#080C14',
-                        }
-                      : {
-                          border: `1px solid ${plan.accent}44`,
-                          color: plan.accent,
-                        }
-                  }
-                >
-                  Get Started
-                </Link>
+                <div className="flex flex-col gap-2">
+                  <PayPalButton
+                    planName={plan.name}
+                    price={plan.price}
+                    planId={plan.planId}
+                    accent={plan.accent}
+                  />
+                  <p className="text-center text-xs text-slate-600">Powered by PayPal · Cancel anytime</p>
+                </div>
               </div>
             ))}
           </div>
@@ -337,7 +367,7 @@ export default function HomePage() {
             Ready to <span className="gradient-text">Go Viral?</span>
           </h2>
           <p className="text-slate-400 text-lg mb-8">
-            Join 3,500+ creators already using CloneVid to grow their audience.
+            Join 3,500+ creators already using Viralio to grow their audience.
           </p>
           <Link
             to="/generate"
@@ -357,9 +387,9 @@ export default function HomePage() {
             <div className="w-6 h-6 rounded-md gradient-btn flex items-center justify-center">
               <Zap size={12} className="text-white" />
             </div>
-            <span className="font-syne font-bold text-sm gradient-text">CloneVid</span>
+            <span className="font-syne font-bold text-sm gradient-text">Viralio</span>
           </div>
-          <p className="text-slate-500 text-xs">© 2026 CloneVid. All rights reserved.</p>
+          <p className="text-slate-500 text-xs">© 2026 Viralio. All rights reserved.</p>
           <div className="flex gap-4 text-xs text-slate-500">
             <a href="#" className="hover:text-white transition-colors">Privacy</a>
             <a href="#" className="hover:text-white transition-colors">Terms</a>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
   Video,
   TrendingUp,
@@ -10,14 +11,10 @@ import {
   Bell,
   CreditCard,
   LogOut,
+  Clock,
+  ArrowUp,
 } from 'lucide-react';
-
-const stats = [
-  { label: 'Total Videos', value: '47', icon: Video, color: '#00E5FF' },
-  { label: 'This Month', value: '12', icon: Calendar, color: '#7B5CFF' },
-  { label: 'Credits Left', value: '18', icon: Sparkles, color: '#FF3CAC' },
-  { label: 'Avg Viral Score', value: '83', icon: TrendingUp, color: '#F59E0B' },
-];
+import { useCredits } from '../hooks/useCredits.js';
 
 const videos = [
   { title: '5 Morning Habits That Changed My Life', date: 'May 28, 2026', score: 87, platform: 'TikTok', duration: '60s' },
@@ -57,7 +54,35 @@ function PlatformBadge({ platform }) {
   );
 }
 
+function MinutesProgressBar({ used, total }) {
+  const pct = Math.round((used / total) * 100);
+  const color = pct < 80 ? '#10B981' : pct < 95 ? '#F59E0B' : '#EF4444';
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex justify-between text-xs text-slate-400">
+        <span>{used} min used</span>
+        <span>{total - used} min left</span>
+      </div>
+      <div className="h-2 rounded-full bg-bg-primary overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-500"
+          style={{ width: `${pct}%`, background: color }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
+  const credits = useCredits('starter');
+
+  const stats = [
+    { label: 'Total Videos', value: '47', icon: Video, color: '#00E5FF' },
+    { label: 'This Month', value: '12', icon: Calendar, color: '#7B5CFF' },
+    { label: 'Minutes Remaining', value: `${credits.minutesRemaining}`, icon: Clock, color: '#FF3CAC' },
+    { label: 'Avg Viral Score', value: '83', icon: TrendingUp, color: '#F59E0B' },
+  ];
+
   return (
     <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col gap-8">
       {/* Header */}
@@ -85,6 +110,28 @@ export default function DashboardPage() {
             <p className="text-xs text-slate-400">{s.label}</p>
           </div>
         ))}
+      </div>
+
+      {/* Minutes usage card */}
+      <div className="gradient-border rounded-2xl p-6 bg-bg-surface">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="font-syne font-bold text-lg text-white">
+              {credits.planName} Plan — {credits.minutesTotal} min/month
+            </h2>
+            <p className="text-xs text-slate-400">
+              {credits.minutesRemaining} minutes remaining this billing period
+            </p>
+          </div>
+          <Link
+            to="/#pricing"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-accent/10 border border-cyan-accent/20 text-cyan-accent text-sm font-semibold hover:bg-cyan-accent/20 transition-colors"
+          >
+            <ArrowUp size={14} />
+            Upgrade Plan
+          </Link>
+        </div>
+        <MinutesProgressBar used={credits.minutesUsed} total={credits.minutesTotal} />
       </div>
 
       {/* Videos Table */}
@@ -157,7 +204,7 @@ export default function DashboardPage() {
           {[
             { icon: User, label: 'Profile', desc: 'Update your name and profile picture', color: '#00E5FF' },
             { icon: Bell, label: 'Notifications', desc: 'Manage email and push notifications', color: '#7B5CFF' },
-            { icon: CreditCard, label: 'Billing & Plan', desc: 'Creator Plan — $49/month', color: '#FF3CAC' },
+            { icon: CreditCard, label: 'Billing & Plan', desc: `${credits.planName} Plan — $${credits.price}/month`, color: '#FF3CAC' },
             { icon: LogOut, label: 'Sign Out', desc: 'Sign out of your account', color: '#F59E0B' },
           ].map((item, i) => (
             <button

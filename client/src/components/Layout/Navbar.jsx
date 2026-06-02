@@ -13,7 +13,7 @@ export default function Navbar() {
           <div className="w-8 h-8 rounded-lg gradient-btn flex items-center justify-center">
             <Zap size={18} className="text-white" />
           </div>
-          <span className="font-syne font-800 text-lg gradient-text">CloneVid</span>
+          <span className="font-syne font-800 text-lg gradient-text">Viralio</span>
         </Link>
 
         {/* Center nav */}

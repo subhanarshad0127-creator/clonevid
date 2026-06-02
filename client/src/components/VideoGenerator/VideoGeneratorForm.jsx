@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Zap, Mic2, User2, Film, ChevronDown } from 'lucide-react';
+import AvatarSelector from './AvatarSelector.jsx';
 
 const STYLES = ['Educational', 'Motivational', 'News', 'Tutorial', 'Storytelling'];
 const LENGTHS = ['30s', '60s', '2min', '3min'];
 const PLATFORMS = ['TikTok', 'Instagram Reels', 'YouTube Shorts', 'YouTube'];
 
-function SelectField({ label, value, options, onChange }) {
+const LENGTH_MINUTES = {
+  '30s': 0.5,
+  '60s': 1,
+  '2min': 2,
+  '3min': 3,
+};
+
+function SelectField({ label, value, options, onChange, hint }) {
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-xs font-semibold text-slate-400 uppercase tracking-widest">{label}</label>
@@ -21,6 +29,7 @@ function SelectField({ label, value, options, onChange }) {
         </select>
         <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none" />
       </div>
+      {hint && <p className="text-xs text-slate-500">{hint}</p>}
     </div>
   );
 }
@@ -61,8 +70,17 @@ function Toggle({ label, icon: Icon, color, checked, onChange, description }) {
   );
 }
 
-export default function VideoGeneratorForm({ formData, setFormData, onGenerate, isGenerating }) {
+export default function VideoGeneratorForm({
+  formData,
+  setFormData,
+  onGenerate,
+  isGenerating,
+  minutesRemaining,
+}) {
   const update = (key) => (val) => setFormData((prev) => ({ ...prev, [key]: val }));
+  const [avatarValue, setAvatarValue] = useState(null);
+
+  const estimatedMin = LENGTH_MINUTES[formData.length] || 1;
 
   return (
     <div className="gradient-border rounded-2xl p-6 bg-bg-surface">
@@ -72,7 +90,7 @@ export default function VideoGeneratorForm({ formData, setFormData, onGenerate, 
         </div>
         <div>
           <h2 className="font-syne font-bold text-xl text-white">Video Generator</h2>
-          <p className="text-xs text-slate-400">Powered by GPT-4, ElevenLabs & HeyGen</p>
+          <p className="text-xs text-slate-400">Powered by GPT-4, ElevenLabs &amp; D-ID</p>
         </div>
       </div>
 
@@ -103,6 +121,7 @@ export default function VideoGeneratorForm({ formData, setFormData, onGenerate, 
           value={formData.length}
           options={LENGTHS}
           onChange={update('length')}
+          hint={`~${estimatedMin} min will be used`}
         />
         <SelectField
           label="Platform"
@@ -113,7 +132,7 @@ export default function VideoGeneratorForm({ formData, setFormData, onGenerate, 
       </div>
 
       {/* Toggles */}
-      <div className="flex flex-col gap-3 mb-8">
+      <div className="flex flex-col gap-3 mb-6">
         <Toggle
           label="Voice Cloning"
           icon={Mic2}
@@ -121,14 +140,6 @@ export default function VideoGeneratorForm({ formData, setFormData, onGenerate, 
           checked={formData.voiceCloning}
           onChange={update('voiceCloning')}
           description="Use your voice or a cloned preset"
-        />
-        <Toggle
-          label="AI Avatar"
-          icon={User2}
-          color="#FF3CAC"
-          checked={formData.aiAvatar}
-          onChange={update('aiAvatar')}
-          description="Photorealistic presenter avatar"
         />
         <Toggle
           label="Auto B-Roll"
@@ -140,6 +151,33 @@ export default function VideoGeneratorForm({ formData, setFormData, onGenerate, 
         />
       </div>
 
+      {/* Avatar Selector */}
+      {formData.aiAvatar && (
+        <div className="mb-6">
+          <AvatarSelector value={avatarValue} onChange={setAvatarValue} />
+        </div>
+      )}
+
+      {/* AI Avatar toggle — after selector so enabling shows it */}
+      <div className="mb-6">
+        <Toggle
+          label="AI Avatar"
+          icon={User2}
+          color="#FF3CAC"
+          checked={formData.aiAvatar}
+          onChange={update('aiAvatar')}
+          description="Photorealistic D-ID presenter avatar"
+        />
+      </div>
+
+      {/* Subtitles note */}
+      <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-cyan-accent/5 border border-cyan-accent/10 mb-6">
+        <span className="text-cyan-accent text-xs font-bold">CC</span>
+        <p className="text-xs text-slate-400">
+          Subtitles are auto-generated and included with every video. Edit them in the video editor.
+        </p>
+      </div>
+
       {/* Generate Button */}
       <button
         onClick={onGenerate}
@@ -149,12 +187,17 @@ export default function VideoGeneratorForm({ formData, setFormData, onGenerate, 
         {isGenerating ? (
           <>
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            Generating...
+            Generating Scripts...
           </>
         ) : (
           <>
             <Zap size={18} />
-            Generate Video
+            Generate Scripts
+            {minutesRemaining !== undefined && (
+              <span className="ml-1 text-xs font-normal opacity-70 bg-white/10 px-2 py-0.5 rounded-full">
+                {minutesRemaining} min remaining
+              </span>
+            )}
           </>
         )}
       </button>

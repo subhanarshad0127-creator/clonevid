@@ -107,6 +107,33 @@ If this helped you, follow for more insights. Drop a comment with your biggest t
   };
 }
 
+function buildMockScripts(topic) {
+  return [
+    {
+      id: 'hook-first',
+      label: 'Hook-First',
+      hook: `Did you know that 92% of people never discover the real truth about "${topic}"? Here's what changes everything — and it takes less than 60 seconds to understand.`,
+      body: `Most people approach ${topic} the wrong way. They focus on tactics when they should be focusing on fundamentals.\n\nHere's the framework that top performers use:\n\nFirst — master the basics before anything else.\nSecond — consistency beats intensity. Show up every single day.\nThird — measure what matters and double down on what works.\n\nFollow for more insights like this.`,
+      wordCount: 68,
+    },
+    {
+      id: 'story-driven',
+      label: 'Story-Driven',
+      hook: `Six months ago, I was completely lost when it came to ${topic}. I tried everything. Nothing worked. Then one small shift changed absolutely everything.`,
+      body: `Let me take you back to where I started. I was overwhelmed, confused, and ready to quit. Sound familiar?\n\nThen I discovered a simple three-step process:\n\nStep one: understand your starting point.\nStep two: build momentum with small wins.\nStep three: stay in the game long enough to see results.\n\nThis changed everything for me. It can for you too.`,
+      wordCount: 72,
+    },
+    {
+      id: 'list-format',
+      label: 'List Format',
+      hook: `${topic} in 2026: here are the 5 things you need to know right now. Number 3 is going to surprise you.`,
+      body: `Number 1: Start with the fundamentals.\nNumber 2: Consistency beats intensity every time.\nNumber 3: Your environment shapes your behavior more than your mindset.\nNumber 4: Track your progress publicly.\nNumber 5: Invest in learning from people ahead of you.\n\nSave this. Share it with someone who needs it.`,
+      wordCount: 65,
+    },
+  ];
+}
+
+// Statuses: idle | loadingScripts | selectingScript | generating | complete
 export function useVideoGeneration() {
   const [formData, setFormData] = useState({
     topic: '',
@@ -118,13 +145,32 @@ export function useVideoGeneration() {
     autoBRoll: true,
   });
 
-  const [generationStatus, setGenerationStatus] = useState('idle'); // idle | generating | complete
+  const [generationStatus, setGenerationStatus] = useState('idle');
   const [currentStep, setCurrentStep] = useState(0);
   const [mockResults, setMockResults] = useState(null);
+  const [scriptOptions, setScriptOptions] = useState(null);
+  const [selectedScript, setSelectedScript] = useState(null);
 
-  const startGeneration = useCallback(() => {
+  // Phase 1: generate 3 script options
+  const loadScripts = useCallback(() => {
     if (!formData.topic.trim()) return;
 
+    setGenerationStatus('loadingScripts');
+    setScriptOptions(null);
+    setSelectedScript(null);
+
+    // Simulate API call to /api/generate/scripts
+    setTimeout(() => {
+      const scripts = buildMockScripts(formData.topic);
+      setScriptOptions(scripts);
+      setGenerationStatus('selectingScript');
+    }, 1800);
+  }, [formData.topic]);
+
+  // Phase 2: confirm script and generate video
+  const startGeneration = useCallback((script) => {
+    const chosenScript = script || selectedScript;
+    setSelectedScript(chosenScript);
     setGenerationStatus('generating');
     setCurrentStep(0);
     setMockResults(null);
@@ -138,7 +184,6 @@ export function useVideoGeneration() {
       if (step < 5) {
         setTimeout(advanceStep, STEP_DELAYS[step]);
       } else {
-        // All steps done
         setTimeout(() => {
           setMockResults(buildMockResults(formData.topic));
           setGenerationStatus('complete');
@@ -147,12 +192,14 @@ export function useVideoGeneration() {
     }
 
     setTimeout(advanceStep, STEP_DELAYS[0]);
-  }, [formData.topic]);
+  }, [formData.topic, selectedScript]);
 
   const resetGeneration = useCallback(() => {
     setGenerationStatus('idle');
     setCurrentStep(0);
     setMockResults(null);
+    setScriptOptions(null);
+    setSelectedScript(null);
   }, []);
 
   return {
@@ -161,6 +208,9 @@ export function useVideoGeneration() {
     generationStatus,
     currentStep,
     mockResults,
+    scriptOptions,
+    selectedScript,
+    loadScripts,
     startGeneration,
     resetGeneration,
   };

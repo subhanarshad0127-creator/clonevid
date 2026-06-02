@@ -5,6 +5,7 @@ const cors = require('cors');
 const generateRoutes = require('./routes/generate');
 const viralRoutes = require('./routes/viral');
 const captionsRoutes = require('./routes/captions');
+const paypalRoutes = require('./routes/paypal');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -13,6 +14,13 @@ const PORT = process.env.PORT || 3001;
 app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:3000'] }));
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Required headers for FFmpeg.wasm SharedArrayBuffer support
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  next();
+});
 
 // Health check
 app.get('/health', (req, res) => {
@@ -23,6 +31,7 @@ app.get('/health', (req, res) => {
 app.use('/api/generate', generateRoutes);
 app.use('/api/viral-score', viralRoutes);
 app.use('/api/captions', captionsRoutes);
+app.use('/api/paypal', paypalRoutes);
 
 // 404
 app.use((req, res) => {
@@ -36,5 +45,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`CloneVid server running on http://localhost:${PORT}`);
+  console.log(`Viralio server running on http://localhost:${PORT}`);
 });

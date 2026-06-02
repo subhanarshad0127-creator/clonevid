@@ -125,6 +125,14 @@ export default function VideoPreview({ topic, length, platform }) {
             AI-optimized for maximum engagement on your selected platform.
           </p>
         </div>
+
+        {/* Subtitles badge */}
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-violet-500/5 border border-violet-500/20">
+          <span className="text-violet-400 text-xs font-bold border border-violet-400/40 rounded px-1">CC</span>
+          <p className="text-xs text-slate-400">
+            <span className="text-violet-300 font-semibold">Subtitles included</span> — auto-generated from your script. Edit them in the video editor below.
+          </p>
+        </div>
       </div>
     </div>
   );
