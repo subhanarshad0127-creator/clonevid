@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: #080C14;
+    color: #e2e8f0;
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Syne', sans-serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0E1420;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #1e2a3a;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #00E5FF44;
+  }
+}
+
+@layer components {
+  /* Gradient border */
+  .gradient-border {
+    position: relative;
+    background: #0E1420;
+    border-radius: 12px;
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 1px;
+    background: linear-gradient(135deg, #00E5FF44, #7B5CFF44, #FF3CAC44);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* Glow effect */
+  .glow-cyan {
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.2), 0 0 40px rgba(0, 229, 255, 0.1);
+  }
+
+  .glow-purple {
+    box-shadow: 0 0 20px rgba(123, 92, 255, 0.2), 0 0 40px rgba(123, 92, 255, 0.1);
+  }
+
+  .glow-pink {
+    box-shadow: 0 0 20px rgba(255, 60, 172, 0.2), 0 0 40px rgba(255, 60, 172, 0.1);
+  }
+
+  /* Glassmorphism */
+  .glass {
+    background: rgba(14, 20, 32, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #00E5FF, #7B5CFF, #FF3CAC);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradient-shift 4s ease infinite;
+  }
+
+  /* Animated gradient button */
+  .gradient-btn {
+    background: linear-gradient(135deg, #00E5FF, #7B5CFF, #FF3CAC);
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+
+  .gradient-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .gradient-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Animated ring */
+  .animated-ring {
+    animation: pulse-ring 2s ease-in-out infinite;
+  }
+
+  /* Step connector line */
+  .step-line {
+    background: linear-gradient(to bottom, #00E5FF33, #7B5CFF33);
+  }
+
+  .step-line-active {
+    background: linear-gradient(to bottom, #00E5FF, #7B5CFF);
+    animation: fade-in 0.5s ease-out;
+  }
+}
+
+@layer utilities {
+  .text-gradient-cyan-purple {
+    background: linear-gradient(135deg, #00E5FF, #7B5CFF);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-purple-pink {
+    background: linear-gradient(135deg, #7B5CFF, #FF3CAC);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-grid-pattern {
+    background-image:
+      linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
+
+/* Keyframe animations (supplement Tailwind) */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes score-fill {
+  from { stroke-dashoffset: 339; }
+}
+
+@keyframes bar-fill {
+  from { width: 0; }
+}
+
+.animate-score-fill {
+  animation: score-fill 1.5s ease-out forwards;
+}
+
+.animate-bar-fill {
+  animation: bar-fill 1s ease-out forwards;
+}
